@@ -160,7 +160,7 @@ void MainWindow::on_editPushButton_clicked()
 
 void MainWindow::skipToSlot(int newWordNum){
     wordNum = newWordNum;
-    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
