@@ -21,17 +21,20 @@ SOURCES += \
     createconnection.cpp \
     main.cpp \
     mainwindow.cpp \
+    selecttable.cpp \
     skipto.cpp
 
 HEADERS += \
     addnewword.h \
     createconnection.h \
     mainwindow.h \
+    selecttable.h \
     skipto.h
 
 FORMS += \
     addnewword.ui \
     mainwindow.ui \
+    selecttable.ui \
     skipto.ui
 
 # Default rules for deployment.

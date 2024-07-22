@@ -31,6 +31,8 @@ private slots:
 
     void skipToSlot(int newWordNum);
 
+    void openSelectTable();
+
 private:
     Ui::MainWindow *ui;
     int wordNum = 0;

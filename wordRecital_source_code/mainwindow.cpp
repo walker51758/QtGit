@@ -3,6 +3,7 @@
 #include "createconnection.h"
 #include "addnewword.h"
 #include "skipto.h"
+#include <selecttable.h>
 
 #include <QFile>
 #include <QTextStream>
@@ -24,24 +25,32 @@ MainWindow::MainWindow(QWidget *parent)
     createConnection(this);
     connect(ui->addNewWordAction, &QAction::triggered, this, &MainWindow::openAddNewWord);
     connect(ui->skipToAction, &QAction::triggered, this, &MainWindow::openSkipTo);
+    connect(ui->updateAction, &QAction::triggered, this, &MainWindow::openSelectTable);
     ifstream infile("setting.txt");
-    if(!infile)
-        qDebug() << "can't open setting.txt when trying to read";
-    infile >> wordNum;
-    infile >> totalNum;
-    for(int i = 0; i < totalNum; ++i)
-        infile >> order[i];
-    infile.close();
-    /*QString cmd = QString("select count(*) from word_list");
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query(db);
-    if(query.exec(cmd)){
-        if(query.next()){
-            totalNum = query.value(0).toInt();
-        }
+    if(infile){
+        infile >> wordNum;
+        infile >> totalNum;
+        for(int i = 0; i < totalNum; ++i)
+            infile >> order[i];
+        infile.close();
     }
-    for(int i = 1; i <= totalNum; ++i)
-        order[i] = i;*/
+    else{
+        QString cmd = QString("select count(*) from word_list");
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        if(query.exec(cmd)){
+            if(query.next()){
+                totalNum = query.value(0).toInt();
+            }
+        }
+        if(totalNum == 0)
+            QMessageBox::information(this, "提示", "未添加任何单词到词库", QMessageBox::Ok);
+        else{
+            for(int i = 0; i < totalNum; ++i)
+                order[i] = i + 1;
+        }
+        wordNum = 0;
+    }
 }
 
 MainWindow::~MainWindow()
@@ -63,9 +72,8 @@ void MainWindow::on_nextPushButton_clicked()
 {
     if(wordNum == totalNum){
         QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
-        wordNum = 1;
+        wordNum = 0;
     }
-    else ++wordNum;
     QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -73,6 +81,10 @@ void MainWindow::on_nextPushButton_clicked()
         if(query.next()){
             displayedWord = query.value(0).toString();
             displayedMeaning = query.value(1).toString();
+            ++wordNum;
+        }
+        else{
+            qDebug() << "Error:" << query.lastError().text();
         }
     }
     else{
@@ -86,7 +98,6 @@ void MainWindow::on_nextPushButton_clicked()
 
 void MainWindow::openAddNewWord(){
     addNewWord* page = new addNewWord;
-    page->realTotalNum = totalNum;
     page->setWindowTitle("添加单词");
     page->show();
 }
@@ -118,8 +129,8 @@ void MainWindow::on_renewPushButton_clicked()
             totalNum = query.value(0).toInt();
         }
     }
-    for(int i = 1; i <= totalNum; ++i)
-        order[i] = i;
+    for(int i = 0; i < totalNum; ++i)
+        order[i] = i+1;
     wordNum = 0;
     QMessageBox::information(this, "提示", "已获取词库最新更新，请点击“下一个”开始复习", QMessageBox::Ok);
     ui->wordLabel->setText("hello");
@@ -131,7 +142,16 @@ void MainWindow::on_editPushButton_clicked()
 {
     addNewWord* page = new addNewWord;
     page->setWindowTitle("编辑单词");
-    page->swiftEditMode(displayedWord, displayedMeaning, order[wordNum]);
+    QString cmd = QString("select source_table, table_id from word_list where id = %0").arg(order[wordNum]);
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    if(query.exec(cmd)){
+        if(query.next()){
+            int editTableId = query.value(1).toInt();
+            QString editTable = query.value(0).toString();
+            page->swiftEditMode(displayedWord, displayedMeaning, editTableId, order[wordNum - 1], editTable);
+        }
+    }
     if(ui->wordLabel->text() == "hello")
         return;
     else
@@ -162,5 +182,12 @@ void MainWindow::openSkipTo(){
     skipTo* page = new skipTo;
     page->limit = totalNum;
     connect(page, &skipTo::skip_to, this, &MainWindow::skipToSlot);
+    page->show();
+}
+
+void MainWindow::openSelectTable(){
+    selectTable* page = new selectTable;
+    page->setWindowTitle("选择表格");
+    connect(page, &selectTable::renew, this, &MainWindow::on_renewPushButton_clicked);
     page->show();
 }

@@ -14,7 +14,7 @@ class addNewWord : public QWidget
 public:
     explicit addNewWord(QWidget *parent = nullptr);
     ~addNewWord();
-    void swiftEditMode(QString editWord, QString editMeaning, int editId);
+    void swiftEditMode(QString editWord, QString editMeaning, int editTableId, int editId, QString editTable);
 
 private slots:
     void on_backPushButton_clicked();
@@ -23,8 +23,9 @@ private slots:
 
 public:
     Ui::addNewWord *ui;
-    int realTotalNum;
+    int editTableId;
     int editId;
+    QString editTable;
     bool editMode = false;
 };
 
