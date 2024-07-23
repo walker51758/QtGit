@@ -76,9 +76,9 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="renewPushButton">
+      <widget class="QPushButton" name="formerPushButton">
        <property name="text">
-        <string>刷新</string>
+        <string>上一个</string>
        </property>
       </widget>
      </item>
@@ -104,9 +104,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="editPushButton">
+      <widget class="QPushButton" name="renewPushButton">
        <property name="text">
-        <string>编辑</string>
+        <string>刷新</string>
        </property>
       </widget>
      </item>
@@ -129,6 +129,7 @@
     <addaction name="addNewWordAction"/>
     <addaction name="skipToAction"/>
     <addaction name="updateAction"/>
+    <addaction name="editAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -146,6 +147,11 @@
   <action name="updateAction">
    <property name="text">
     <string>update word list</string>
+   </property>
+  </action>
+  <action name="editAction">
+   <property name="text">
+    <string>edit</string>
    </property>
   </action>
  </widget>

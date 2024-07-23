@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->addNewWordAction, &QAction::triggered, this, &MainWindow::openAddNewWord);
     connect(ui->skipToAction, &QAction::triggered, this, &MainWindow::openSkipTo);
     connect(ui->updateAction, &QAction::triggered, this, &MainWindow::openSelectTable);
+    connect(ui->editAction, &QAction::triggered, this, &MainWindow::openEdit);
     ifstream infile("setting.txt");
     if(infile){
         infile >> wordNum;
@@ -46,8 +47,8 @@ MainWindow::MainWindow(QWidget *parent)
         if(totalNum == 0)
             QMessageBox::information(this, "提示", "未添加任何单词到词库", QMessageBox::Ok);
         else{
-            for(int i = 0; i < totalNum; ++i)
-                order[i] = i + 1;
+            for(int i = 1; i <= totalNum; ++i)
+                order[i] = i;
         }
         wordNum = 0;
     }
@@ -72,8 +73,10 @@ void MainWindow::on_nextPushButton_clicked()
 {
     if(wordNum == totalNum){
         QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
-        wordNum = 0;
+        wordNum = 1;
     }
+    else
+        ++wordNum;
     QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -81,7 +84,6 @@ void MainWindow::on_nextPushButton_clicked()
         if(query.next()){
             displayedWord = query.value(0).toString();
             displayedMeaning = query.value(1).toString();
-            ++wordNum;
         }
         else{
             qDebug() << "Error:" << query.lastError().text();
@@ -129,8 +131,8 @@ void MainWindow::on_renewPushButton_clicked()
             totalNum = query.value(0).toInt();
         }
     }
-    for(int i = 0; i < totalNum; ++i)
-        order[i] = i+1;
+    for(int i = 1; i <= totalNum; ++i)
+        order[i] = i;
     wordNum = 0;
     QMessageBox::information(this, "提示", "已获取词库最新更新，请点击“下一个”开始复习", QMessageBox::Ok);
     ui->wordLabel->setText("hello");
@@ -138,7 +140,7 @@ void MainWindow::on_renewPushButton_clicked()
     ui->numDisplayLabel->clear();
 }
 
-void MainWindow::on_editPushButton_clicked()
+void MainWindow::openEdit()
 {
     addNewWord* page = new addNewWord;
     page->setWindowTitle("编辑单词");
@@ -149,7 +151,7 @@ void MainWindow::on_editPushButton_clicked()
         if(query.next()){
             int editTableId = query.value(1).toInt();
             QString editTable = query.value(0).toString();
-            page->swiftEditMode(displayedWord, displayedMeaning, editTableId, order[wordNum - 1], editTable);
+            page->swiftEditMode(displayedWord, displayedMeaning, editTableId, order[wordNum], editTable);
         }
     }
     if(ui->wordLabel->text() == "hello")
@@ -160,7 +162,7 @@ void MainWindow::on_editPushButton_clicked()
 
 void MainWindow::skipToSlot(int newWordNum){
     wordNum = newWordNum;
-    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
@@ -190,4 +192,32 @@ void MainWindow::openSelectTable(){
     page->setWindowTitle("选择表格");
     connect(page, &selectTable::renew, this, &MainWindow::on_renewPushButton_clicked);
     page->show();
+}
+
+void MainWindow::on_formerPushButton_clicked()
+{
+    if(wordNum == 1){
+        QMessageBox::information(this, "提示", "已回到第一个单词", QMessageBox::Ok);
+    }
+    else
+        --wordNum;
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    if(query.exec(cmd)){
+        if(query.next()){
+            displayedWord = query.value(0).toString();
+            displayedMeaning = query.value(1).toString();
+        }
+        else{
+            qDebug() << "Error:" << query.lastError().text();
+        }
+    }
+    else{
+        qDebug() << "Error:" << query.lastError().text();
+    }
+    ui->wordLabel->setText(displayedWord);
+    ui->meaningLabel->clear();
+    QString numDisplayString = QString("%0 / %1").arg(wordNum).arg(totalNum);
+    ui->numDisplayLabel->setText(numDisplayString);
 }

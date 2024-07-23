@@ -97,4 +97,6 @@ void addNewWord::swiftEditMode(QString editWord, QString editMeaning, int tableI
     editTableId = tableId;
     editTable = table;
     editMode = true;
+    ui->biaogeLabel->setVisible(0);
+    ui->tabelLineEdit->setVisible(0);
 }

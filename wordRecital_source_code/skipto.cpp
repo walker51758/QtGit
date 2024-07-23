@@ -8,6 +8,7 @@ skipTo::skipTo(QWidget *parent) :
     ui(new Ui::skipTo)
 {
     ui->setupUi(this);
+    connect(ui->wordNumLineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 }
 
 skipTo::~skipTo()

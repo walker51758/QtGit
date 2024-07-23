@@ -27,11 +27,13 @@ private slots:
 
     void on_renewPushButton_clicked();
 
-    void on_editPushButton_clicked();
+    void openEdit();
 
     void skipToSlot(int newWordNum);
 
     void openSelectTable();
+
+    void on_formerPushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
