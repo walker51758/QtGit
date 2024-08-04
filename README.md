@@ -1,3 +1,7 @@
+### 注意
+程序在我的电脑上是正确、可运行的，但是在其他人的电脑上是不行的。要想使用该应用，首先要安装MySQL数据库。其次，在createconnection.cpp中修改代码，连接到自己的数据库。同时，最好在数据库中创建一个word_list表格，如果你想按照自己的方式命名，那你需要修改代码中凡是出现“word_list”的地方；最后，在Qt中编译源码（要想顺利编译，需要做一些配置，具体参见报告），将生成的wordRecital.exe替换本仓库的.exe。
+### warnning
+The application was well operable on my computer, but not on others. To use this app, you must firstly install MySQL. Then, edit the code in createconnection.cpp, connecting to your own database. Meanwhile, you're highly suggested to create a table named "word_list" in your database. If you want use your personal way of naming, make sure you fully understand the source code and try to modify every line of the code which consists of "word_list". Finally, you should compile the code through Qt (you need some configurations to assure a successful compilation, introduced in detail in my report), and substitute the old wordRecital.exe for the newly generated.
 ## 中文版
 这是我2024年暑假备考GRE的时候制作的应用程序，主要是帮助我背单词。因为我在背单词的过程中发现，有些词按照单词书的顺序出现我能联想到它的意思，但是当他冷不丁地跳出来的时候我就不认识了。于是我想如果能把这些词随机打乱，然后给出英文单词，考察中文意思，这样就能避免出现“熟悉的陌生人”。一方面有现实的需要，另一方面是我刚刚用Qt做完大作业，虽然很简陋，但是也有学到了一些基础操作。正是因为大作业的不如意，我才想借着这个机会把没有深入探究的问题好好解决一下。
 ## English Version
