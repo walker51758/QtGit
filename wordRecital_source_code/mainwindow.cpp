@@ -47,8 +47,8 @@ MainWindow::MainWindow(QWidget *parent)
         if(totalNum == 0)
             QMessageBox::information(this, "提示", "未添加任何单词到词库", QMessageBox::Ok);
         else{
-            for(int i = 1; i <= totalNum; ++i)
-                order[i] = i;
+            for(int i = 0; i < totalNum; ++i)
+                order[i] = i + 1;
         }
         wordNum = 0;
     }
@@ -77,7 +77,7 @@ void MainWindow::on_nextPushButton_clicked()
     }
     else
         ++wordNum;
-    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
@@ -131,8 +131,8 @@ void MainWindow::on_renewPushButton_clicked()
             totalNum = query.value(0).toInt();
         }
     }
-    for(int i = 1; i <= totalNum; ++i)
-        order[i] = i;
+    for(int i = 0; i < totalNum; ++i)
+        order[i] = i + 1;
     wordNum = 0;
     QMessageBox::information(this, "提示", "已获取词库最新更新，请点击“下一个”开始复习", QMessageBox::Ok);
     ui->wordLabel->setText("hello");
@@ -144,14 +144,14 @@ void MainWindow::openEdit()
 {
     addNewWord* page = new addNewWord;
     page->setWindowTitle("编辑单词");
-    QString cmd = QString("select source_table, table_id from word_list where id = %0").arg(order[wordNum]);
+    QString cmd = QString("select source_table, table_id from word_list where id = %0").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
         if(query.next()){
             int editTableId = query.value(1).toInt();
             QString editTable = query.value(0).toString();
-            page->swiftEditMode(displayedWord, displayedMeaning, editTableId, order[wordNum], editTable);
+            page->swiftEditMode(displayedWord, displayedMeaning, editTableId, order[wordNum - 1], editTable);
         }
     }
     if(ui->wordLabel->text() == "hello")
@@ -162,7 +162,7 @@ void MainWindow::openEdit()
 
 void MainWindow::skipToSlot(int newWordNum){
     wordNum = newWordNum;
-    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
@@ -201,7 +201,7 @@ void MainWindow::on_formerPushButton_clicked()
     }
     else
         --wordNum;
-    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum]);
+    QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     if(query.exec(cmd)){
