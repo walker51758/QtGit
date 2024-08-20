@@ -130,6 +130,7 @@
     <addaction name="skipToAction"/>
     <addaction name="updateAction"/>
     <addaction name="editAction"/>
+    <addaction name="switchModeAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -152,6 +153,11 @@
   <action name="editAction">
    <property name="text">
     <string>edit</string>
+   </property>
+  </action>
+  <action name="switchModeAction">
+   <property name="text">
+    <string>switch mode</string>
    </property>
   </action>
  </widget>

@@ -17,6 +17,7 @@ public:
     ~MainWindow();
     void openAddNewWord();
     void openSkipTo();
+    void switchMode();
 
 private slots:
     void on_nextPushButton_clicked();
@@ -42,5 +43,7 @@ private:
     int totalNum;
     QString displayedWord;
     QString displayedMeaning;
+    int mode = 1;
+    bool meaningDisplayed = false;
 };
 #endif // MAINWINDOW_H

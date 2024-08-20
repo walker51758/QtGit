@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->skipToAction, &QAction::triggered, this, &MainWindow::openSkipTo);
     connect(ui->updateAction, &QAction::triggered, this, &MainWindow::openSelectTable);
     connect(ui->editAction, &QAction::triggered, this, &MainWindow::openEdit);
+    connect(ui->switchModeAction, &QAction::triggered, this, &MainWindow::switchMode);
     ifstream infile("setting.txt");
     if(infile){
         infile >> wordNum;
@@ -75,8 +76,21 @@ void MainWindow::on_nextPushButton_clicked()
         QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
         wordNum = 1;
     }
-    else
+    else{
+        if(wordNum == 0) wordNum++;
+        if(mode == 2){
+            if(meaningDisplayed){
+                wordNum++;
+                meaningDisplayed = false;
+            }
+            else{
+                on_meaningPushButton_clicked();
+                return;
+            }
+        }
+        else
         ++wordNum;
+    }
     QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -106,6 +120,7 @@ void MainWindow::openAddNewWord(){
 void MainWindow::on_meaningPushButton_clicked()
 {
     ui->meaningLabel->setText(displayedMeaning);
+    meaningDisplayed = true;
 }
 
 void MainWindow::on_randomPushButton_clicked()
@@ -220,4 +235,15 @@ void MainWindow::on_formerPushButton_clicked()
     ui->meaningLabel->clear();
     QString numDisplayString = QString("%0 / %1").arg(wordNum).arg(totalNum);
     ui->numDisplayLabel->setText(numDisplayString);
+}
+
+void MainWindow::switchMode(){
+    if(mode == 1){
+        mode = 2;
+        QMessageBox::information(this, "提示", "已切换至记忆模式", QMessageBox::Ok);
+    }
+    else{
+        mode = 1;
+        QMessageBox::information(this, "提示", "已切换至测试模式", QMessageBox::Ok);
+    }
 }
