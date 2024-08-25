@@ -84,6 +84,7 @@ void MainWindow::on_nextPushButton_clicked()
     }
     else{
         if(mode == 2){
+            if(displayedWord == "hello") meaningDisplayed = true;
             if(meaningDisplayed){
                 wordNum++;
                 meaningDisplayed = false;
