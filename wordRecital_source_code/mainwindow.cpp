@@ -73,11 +73,16 @@ MainWindow::~MainWindow()
 void MainWindow::on_nextPushButton_clicked()
 {
     if(wordNum == totalNum){
-        QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
-        wordNum = 1;
+        if(meaningDisplayed){
+            QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
+            wordNum = 1;
+        }
+        else{
+            on_meaningPushButton_clicked();
+            return;
+        }
     }
     else{
-        if(wordNum == 0) wordNum++;
         if(mode == 2){
             if(meaningDisplayed){
                 wordNum++;

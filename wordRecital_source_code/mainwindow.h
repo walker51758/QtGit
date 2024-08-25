@@ -44,6 +44,6 @@ private:
     QString displayedWord;
     QString displayedMeaning;
     int mode = 1;
-    bool meaningDisplayed = false;
+    bool meaningDisplayed = true;
 };
 #endif // MAINWINDOW_H
