@@ -43,7 +43,7 @@ private:
     int totalNum;
     QString displayedWord;
     QString displayedMeaning;
-    int mode = 1;
+    int mode;
     bool meaningDisplayed = true;
 };
 #endif // MAINWINDOW_H

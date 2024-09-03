@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     if(infile){
         infile >> wordNum;
         infile >> totalNum;
+        infile >> mode;
         for(int i = 0; i < totalNum; ++i)
             infile >> order[i];
         infile.close();
@@ -52,6 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
                 order[i] = i + 1;
         }
         wordNum = 0;
+        mode = 1;
+    }
+    switch(mode){
+    case 1: ui->modeDisplayLabel->setText("测试模式");
+        break;
+    case 2: ui->modeDisplayLabel->setText("记忆模式");
+        break;
+    defaut: break;
     }
 }
 
@@ -62,6 +71,7 @@ MainWindow::~MainWindow()
         qDebug() << "can't open setting.txt when trying to write";
     outfile << wordNum << endl;
     outfile << totalNum << endl;
+    outfile << mode << endl;
     for(int i = 0; i < totalNum; ++i)
         outfile << order[i] << " ";
     outfile << endl;
@@ -217,6 +227,7 @@ void MainWindow::openSelectTable(){
 
 void MainWindow::on_formerPushButton_clicked()
 {
+    if(displayedWord == "Hello") return;
     if(wordNum == 1){
         QMessageBox::information(this, "提示", "已回到第一个单词", QMessageBox::Ok);
     }
@@ -246,10 +257,10 @@ void MainWindow::on_formerPushButton_clicked()
 void MainWindow::switchMode(){
     if(mode == 1){
         mode = 2;
-        QMessageBox::information(this, "提示", "已切换至记忆模式", QMessageBox::Ok);
+        ui->modeDisplayLabel->setText("记忆模式");
     }
     else{
         mode = 1;
-        QMessageBox::information(this, "提示", "已切换至测试模式", QMessageBox::Ok);
+        ui->modeDisplayLabel->setText("测试模式");
     }
 }
