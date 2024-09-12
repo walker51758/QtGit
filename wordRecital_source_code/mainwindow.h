@@ -36,6 +36,10 @@ private slots:
 
     void on_formerPushButton_clicked();
 
+    void on_collectPushButton_clicked();
+
+    void clearTheReview();
+
 private:
     Ui::MainWindow *ui;
     int wordNum = 0;

@@ -69,9 +69,9 @@
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>110</y>
+      <y>70</y>
       <width>82</width>
-      <height>311</height>
+      <height>361</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -93,6 +93,13 @@
       <widget class="QPushButton" name="meaningPushButton">
        <property name="text">
         <string>显示意思</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="collectPushButton">
+       <property name="text">
+        <string>收藏</string>
        </property>
       </widget>
      </item>
@@ -144,6 +151,7 @@
     <addaction name="updateAction"/>
     <addaction name="editAction"/>
     <addaction name="switchModeAction"/>
+    <addaction name="clearAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -171,6 +179,11 @@
   <action name="switchModeAction">
    <property name="text">
     <string>switch mode</string>
+   </property>
+  </action>
+  <action name="clearAction">
+   <property name="text">
+    <string>clear the &quot;review&quot;</string>
    </property>
   </action>
  </widget>

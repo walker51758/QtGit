@@ -14,6 +14,8 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <random>
+#include <QShortcut>
+#include <QKeySequence>
 
 using namespace std;
 
@@ -23,11 +25,18 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     createConnection(this);
+    QShortcut* nextShortcut = new QShortcut(QKeySequence(Qt::Key_Right), this);
+    QShortcut* formerShortcut = new QShortcut(QKeySequence(Qt::Key_Left), this);
+    QShortcut* collectShortcut = new QShortcut(QKeySequence("Ctrl+C"), this);
     connect(ui->addNewWordAction, &QAction::triggered, this, &MainWindow::openAddNewWord);
     connect(ui->skipToAction, &QAction::triggered, this, &MainWindow::openSkipTo);
     connect(ui->updateAction, &QAction::triggered, this, &MainWindow::openSelectTable);
     connect(ui->editAction, &QAction::triggered, this, &MainWindow::openEdit);
     connect(ui->switchModeAction, &QAction::triggered, this, &MainWindow::switchMode);
+    connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearTheReview);
+    connect(nextShortcut, &QShortcut::activated, this, &MainWindow::on_nextPushButton_clicked);
+    connect(formerShortcut, &QShortcut::activated, this, &MainWindow::on_formerPushButton_clicked);
+    connect(collectShortcut, &QShortcut::activated, this, &MainWindow::on_collectPushButton_clicked);
     ifstream infile("setting.txt");
     if(infile){
         infile >> wordNum;
@@ -60,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
         break;
     case 2: ui->modeDisplayLabel->setText("记忆模式");
         break;
-    defaut: break;
+    default: break;
     }
 }
 
@@ -82,6 +91,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_nextPushButton_clicked()
 {
+    if(totalNum == 0){
+        QMessageBox::information(this, "提示", "列表中无单词", QMessageBox::Ok);
+        return;
+    }
     if(wordNum == totalNum){
         if(meaningDisplayed){
             QMessageBox::information(this, "提示", "已完成本轮复习", QMessageBox::Ok);
@@ -169,6 +182,7 @@ void MainWindow::on_renewPushButton_clicked()
     ui->wordLabel->setText("hello");
     ui->meaningLabel->setText("你好");
     ui->numDisplayLabel->clear();
+    meaningDisplayed = true;
 }
 
 void MainWindow::openEdit()
@@ -233,6 +247,7 @@ void MainWindow::on_formerPushButton_clicked()
     }
     else
         --wordNum;
+    displayedWord = false;
     QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -262,5 +277,42 @@ void MainWindow::switchMode(){
     else{
         mode = 1;
         ui->modeDisplayLabel->setText("测试模式");
+    }
+}
+
+
+void MainWindow::on_collectPushButton_clicked()
+{
+    QString wordString = displayedWord;
+    QString meaningString = displayedMeaning;
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    int tableId = 0;
+    QString cmd2 = QString("select count(*) from review");
+    if(query.exec(cmd2)){
+        if(query.next()){
+            tableId = query.value(0).toInt() + 1;
+        }
+    }
+    QString cmd3 = QString("insert into review values('%1', '%2', '%3');")
+            .arg(wordString).arg(meaningString).arg(tableId);
+    if(query.exec(cmd3)){
+         QMessageBox::information(this, "提示", "单词添加成功！", QMessageBox::Ok);
+    }
+    else
+        QMessageBox::information(this, "错误", "新单词插入失败", QMessageBox::Ok);
+}
+
+void MainWindow::clearTheReview(){
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "确认操作", "你确定要执行此操作吗？",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (!query.exec("DELETE FROM review")) {
+             qDebug() << "database error: " << query.lastError().text();
+        }
     }
 }
