@@ -247,7 +247,7 @@ void MainWindow::on_formerPushButton_clicked()
     }
     else
         --wordNum;
-    displayedWord = false;
+    meaningDisplayed = false;
     QString cmd = QString("select word, meaning from word_list where id = %1").arg(order[wordNum - 1]);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -273,6 +273,7 @@ void MainWindow::switchMode(){
     if(mode == 1){
         mode = 2;
         ui->modeDisplayLabel->setText("记忆模式");
+        if(ui->meaningLabel->text() == "") meaningDisplayed = false;
     }
     else{
         mode = 1;
@@ -287,6 +288,15 @@ void MainWindow::on_collectPushButton_clicked()
     QString meaningString = displayedMeaning;
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
+    QString cmd = QString("SELECT COUNT(*) FROM review WHERE word = '%1'").arg(wordString);
+    if(query.exec(cmd)){
+        if(query.next()){
+            if(query.value(0).toInt() == 1){
+                QMessageBox::information(this, "提示", "已收藏！", QMessageBox::Ok);
+                return;
+            }
+        }
+    }
     int tableId = 0;
     QString cmd2 = QString("select count(*) from review");
     if(query.exec(cmd2)){
